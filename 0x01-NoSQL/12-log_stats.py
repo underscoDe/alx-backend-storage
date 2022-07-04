@@ -2,7 +2,6 @@
 """Defines a function that  provides some stats
    about Nginx logs stored in MongoDB
 """
-
 from pymongo import MongoClient
 
 
@@ -12,17 +11,17 @@ def nginx_stats_check():
     collection = client.logs.nginx
 
     doc_count = collection.count_documents({})
-    print(f'{doc_count} logs')
+    print('{} logs'.format(doc_count))
 
     methods_list = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-    print('Methods:')
+    print("Methods:")
     for method in methods_list:
-        nbr = collection.count_documents({"method": method})
-        print(f'\tmethod {method}: {nbr}')
+        method_count = collection.count_documents({"method": method})
+        print('\tmethod {}: {}'.format(method, method_count))
     status_count = collection.count_documents({
         "method": "GET", "path": "/status"
     })
-    print(f'{status_count} status check')
+    print('{} status check'.format(status_count))
 
 
 if __name__ == "__main__":
