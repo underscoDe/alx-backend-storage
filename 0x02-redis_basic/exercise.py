@@ -2,9 +2,23 @@
 """
 Redis basic.
 """
+from typing import Union, Callable, Optional
+from functools import wraps
 import redis
 import uuid
-from typing import Union, Callable, Optional
+
+
+def count_calls(method: Callable) -> Callable:
+    """Create and return function that increments the count \
+        for that key every time the method is called and returns \
+        the value returned by the original method"""
+    method_key = method.__qualname__
+
+    @wraps
+    def wrapper(self, *args, **kwargs):
+        self._redis.incr(method_key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -14,6 +28,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """takes and stores a data argument and returns a string."""
         key = str(uuid.uuid4())
