@@ -21,8 +21,9 @@ def call_history(method: Callable) -> Callable:
         return result
     return wrapper
 
+
 def count_calls(method: Callable) -> Callable:
-    """Create and return function that increments the count \
+    """Creates and returns function that increments the count \
         for that key every time the method is called and returns \
         the value returned by the original method"""
     method_key = method.__qualname__
@@ -32,6 +33,19 @@ def count_calls(method: Callable) -> Callable:
         self._redis.incr(method_key)
         return method(self, *args, **kwargs)
     return wrapper
+
+
+def replay(method: Callable) -> None:
+    """Displays the history of calls of a particular function"""
+    method_key = method.__qualname__
+    inputs, outputs = method_key + ':inputs', method_key + ':outputs'
+    redis = method.__self__._redis
+    method_count = redis.get(method_key).decode('utf-8')
+    print(f'{method_key} was called {method_count} times:')
+    IOTuple = zip(redis.lrange(inputs, 0, -1), redis.lrange(outputs, 0, -1))
+    for inp, outp in list(IOTuple):
+        attr, data = inp.decode("utf-8"), outp.decode("utf-8")
+        print(f'{method_key}(*{attr}) -> {data}')
 
 
 class Cache:
