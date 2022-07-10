@@ -18,6 +18,8 @@ def url_count(method: Callable) -> Callable:
         return method(*args)
     return wrapper
 
+
+@url_count
 def get_page(url: str) -> str:
     """ get a page and cache value"""
     redis_client.set(f'cached:{url}', count)
