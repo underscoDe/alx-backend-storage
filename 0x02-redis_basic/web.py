@@ -16,7 +16,7 @@ def url_count(method: Callable) -> Callable:
     def wrapper(*args):
         redis_client.incr(f"count:{args[0]}")
         global count
-        count += 0
+        count += 1
         return method(*args)
     return wrapper
 
