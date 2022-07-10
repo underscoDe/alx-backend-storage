@@ -15,10 +15,10 @@ def url_count(method: Callable) -> Callable:
     def wrapper(*args, **kwargs):
         url = args[0]
         redis_client.incr(f"count:{url}")
-        cached = redis_client.get(f'cached:{url}')
+        cached = redis_client.get(f'{url}')
         if cached:
             return cached.decode('utf-8')
-        redis_client.setex(f'cached:{url}, 10, {method(url)}')
+        redis_client.setex(f'{url}, 10, {method(url)}')
         return method(*args, **kwargs)
     return wrapper
 
