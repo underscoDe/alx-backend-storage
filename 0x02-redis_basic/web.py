@@ -24,9 +24,9 @@ def url_count(method: Callable) -> Callable:
 @url_count
 def get_page(url: str) -> str:
     """ get a page and cache value"""
-    redis_client.set(f'cached:{url}', count)
+    redis_client.set(f'{url}', count)
     response = requests.get(url)
-    redis_client.setex(f'cached:{url}', 10, redis_client.get(f'cached:{url}'))
+    redis_client.setex(f'{url}', 10, redis_client.get(f'{url}'))
     return response.text
 
 
